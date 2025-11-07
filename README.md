@@ -47,6 +47,12 @@ pnpm lint
 pnpm format
 ```
 
+## Sequence Wallet
+
+The app includes a Sequence wallet connection button on the landing page. It connects to the production Sequence wallet at `sequence.app`.
+
+The project access key is configured in `src/config/wallet.ts`.
+
 ## Pre-commit Hooks
 
 This repository uses [lefthook](https://github.com/evilmartians/lefthook) to automatically run linting and formatting on staged files before each commit. The hooks are installed automatically when you run `pnpm install`.

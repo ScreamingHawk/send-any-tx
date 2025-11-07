@@ -1,3 +1,5 @@
+import { ConnectWalletButton } from './components/ConnectWalletButton'
+
 function App() {
   return (
     <div className="min-h-screen bg-retro-bg">
@@ -8,8 +10,8 @@ function App() {
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-center text-retro-accent mb-8 tracking-wider">
                 SEND ANY TX
               </h1>
-              <div className="text-center text-retro-text-muted text-lg md:text-xl">
-                <p className="mb-4">Ready to send transactions</p>
+              <div className="mt-12 flex justify-center">
+                <ConnectWalletButton />
               </div>
             </div>
           </div>

@@ -16,4 +16,12 @@
     @apply bg-retro-bg text-retro-text;
     font-family: var(--font-family-retro);
   }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
 }
