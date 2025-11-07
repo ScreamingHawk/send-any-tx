@@ -20,6 +20,7 @@
     "0xsequence": "^2.3.33",
     "@0xsequence/connect": "^5.3.29",
     "@tanstack/react-query": "^5.90.7",
+    "ox": "^0.9.14",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "viem": "^2.38.6",

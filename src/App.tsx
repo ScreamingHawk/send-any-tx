@@ -1,6 +1,10 @@
+import { useAccount } from 'wagmi'
 import { ConnectWalletButton } from './components/ConnectWalletButton'
+import { SendTransactionForm } from './components/SendTransactionForm'
 
 function App() {
+  const { isConnected } = useAccount()
+
   return (
     <div className="min-h-screen bg-retro-bg">
       <div className="container mx-auto px-4 py-8">
@@ -13,6 +17,11 @@ function App() {
               <div className="mt-12 flex justify-center">
                 <ConnectWalletButton />
               </div>
+              {isConnected && (
+                <div className="mt-12">
+                  <SendTransactionForm />
+                </div>
+              )}
             </div>
           </div>
         </div>
