@@ -2,7 +2,12 @@ import { useState, useMemo } from 'react'
 import { AbiFunction } from 'ox'
 import type { Abi } from 'viem'
 import { parseEther } from 'viem'
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import {
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useChainId,
+} from 'wagmi'
+import { ALL_CHAINS } from '../config/wagmi'
 import { Button } from './Button'
 import { ParameterInput } from './ParameterInput'
 
@@ -80,6 +85,15 @@ export const SendTransactionForm = () => {
   } = useWriteContract()
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
     useWaitForTransactionReceipt({ hash })
+  const chainId = useChainId()
+
+  // Compute explorer URL for the transaction
+  const explorerUrl = useMemo(() => {
+    if (!hash) return null
+    const chain = ALL_CHAINS.find(c => c.id === chainId)
+    if (!chain?.blockExplorers?.default?.url) return null
+    return `${chain.blockExplorers.default.url}/tx/${hash}`
+  }, [hash, chainId])
 
   const handleSend = () => {
     if (!parsedFunction || !toAddress) {
@@ -227,9 +241,22 @@ export const SendTransactionForm = () => {
         )}
 
         {/* Success Display */}
-        {isConfirmed && (
-          <div className="bg-green-900/30 border-2 border-green-500 text-green-300 px-4 py-3 text-sm">
-            Transaction confirmed! Hash: {hash}
+        {isConfirmed && hash && (
+          <div className="bg-green-900/30 border-2 border-green-500 text-green-300 px-4 py-3 text-sm space-y-2">
+            <div>Transaction confirmed!</div>
+            <div className="font-mono text-xs break-all">Hash: {hash}</div>
+            {explorerUrl && (
+              <div>
+                <a
+                  href={explorerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-green-400 hover:text-green-200 underline font-bold"
+                >
+                  View on Explorer →
+                </a>
+              </div>
+            )}
           </div>
         )}
 
