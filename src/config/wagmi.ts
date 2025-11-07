@@ -91,12 +91,12 @@ export const ALL_CHAINS: Chain[] = [
   blast,
   blastSepolia,
   mode,
-].sort((a, b) => a.name.localeCompare(b.name))
+]
 
 export const getWagmiConfig = () => {
   const projectAccessKey = WALLET_CONFIG.prod.projectAccessKey
   const walletAppURL = WALLET_CONFIG.prod.url
-  const defaultNetwork = mainnet.id
+  const defaultNetwork = arbitrumSepolia.id
 
   const wallet = sequence({
     walletAppURL,
