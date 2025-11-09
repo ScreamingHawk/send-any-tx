@@ -13,7 +13,7 @@ export const ConnectWalletButton = () => {
   const { connect, connectors, isPending } = useConnect()
   const { disconnect } = useDisconnect()
   const chainId = useChainId()
-  const { switchChain } = useSwitchChain()
+  const { switchChain, isPending: isSwitchingChain } = useSwitchChain()
 
   const formatAddress = (addr: string | null) => {
     if (!addr) return ''
@@ -21,10 +21,23 @@ export const ConnectWalletButton = () => {
   }
 
   const sequenceConnector = connectors.find(c => c.id === 'sequence')
+  const metaMaskConnector =
+    connectors.find(
+      c =>
+        c.id !== 'sequence' &&
+        (c.id === 'io.metamask' ||
+          c.id === 'metaMaskSDK' ||
+          c.name?.toLowerCase().includes('metamask') ||
+          c.name === 'MetaMask' ||
+          (c.id && c.id.includes('meta'))),
+    ) ||
+    connectors.find(c => c.id !== 'sequence' && !c.id?.includes('sequence'))
 
-  const handleConnect = () => {
-    if (sequenceConnector) {
-      connect({ connector: sequenceConnector })
+  const handleConnect = (
+    connector?: typeof sequenceConnector | typeof metaMaskConnector,
+  ) => {
+    if (connector) {
+      connect({ connector })
     }
   }
 
@@ -55,13 +68,18 @@ export const ConnectWalletButton = () => {
             </label>
             <select
               value={chainId}
-              onChange={e => {
+              onChange={async e => {
                 const newChainId = parseInt(e.target.value)
                 if (newChainId !== chainId) {
-                  switchChain({ chainId: newChainId })
+                  try {
+                    await switchChain({ chainId: newChainId })
+                  } catch {
+                    // Silently handle chain switch errors (user may reject the prompt)
+                  }
                 }
               }}
-              className="w-full bg-retro-surface border-4 border-retro-accent text-retro-accent px-4 py-2 font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-retro-accent focus:ring-offset-2 focus:ring-offset-retro-bg cursor-pointer"
+              disabled={isSwitchingChain}
+              className="w-full bg-retro-surface border-4 border-retro-accent text-retro-accent px-4 py-2 font-bold uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-retro-accent focus:ring-offset-2 focus:ring-offset-retro-bg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {ALL_CHAINS.map(chain => (
                 <option
@@ -76,20 +94,39 @@ export const ConnectWalletButton = () => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-4">
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={handleConnect}
-            disabled={isPending || !sequenceConnector}
-          >
-            {isPending ? 'Connecting...' : 'Connect Sequence Wallet'}
-          </Button>
-          {!sequenceConnector && (
-            <div className="text-red-400 text-sm text-center max-w-md">
-              Sequence connector not available
-            </div>
-          )}
+        <div className="flex flex-col items-center gap-4 w-full">
+          <div className="text-retro-text-muted text-sm uppercase tracking-wider mb-2">
+            Connect Wallet
+          </div>
+          <div className="flex flex-row gap-3 w-full max-w-xs justify-center">
+            {metaMaskConnector && (
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={() => handleConnect(metaMaskConnector)}
+                disabled={isPending}
+                className="flex-1"
+              >
+                {isPending ? 'Connecting...' : 'MetaMask'}
+              </Button>
+            )}
+            {sequenceConnector && (
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={() => handleConnect(sequenceConnector)}
+                disabled={isPending}
+                className="flex-1"
+              >
+                {isPending ? 'Connecting...' : 'Sequence'}
+              </Button>
+            )}
+            {!metaMaskConnector && !sequenceConnector && (
+              <div className="text-red-400 text-sm text-center max-w-md">
+                No wallet connectors available
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

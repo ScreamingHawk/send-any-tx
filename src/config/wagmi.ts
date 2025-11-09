@@ -29,6 +29,7 @@ import {
   blastSepolia,
   mode,
 } from 'wagmi/chains'
+import { metaMask } from '@wagmi/connectors'
 import { sequence, type Wallet } from '@0xsequence/connect'
 import { WALLET_CONFIG } from './wallet'
 import type { Chain } from 'wagmi/chains'
@@ -109,7 +110,12 @@ export const getWagmiConfig = () => {
   wallet.name = 'Sequence'
 
   const wallets: Wallet[] = [wallet]
-  const connectors = getConnectWallets(projectAccessKey, wallets)
+  const sequenceConnectors = getConnectWallets(projectAccessKey, wallets)
+
+  // Add MetaMask connector
+  const metaMaskConnector = metaMask()
+
+  const connectors = [...sequenceConnectors, metaMaskConnector]
 
   const transports: Record<number, ReturnType<typeof http>> = {}
   ALL_CHAINS.forEach(chain => {
