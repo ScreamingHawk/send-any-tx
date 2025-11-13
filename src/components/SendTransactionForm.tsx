@@ -270,9 +270,14 @@ export const SendTransactionForm = () => {
             isConfirming ||
             !parsedFunction ||
             !toAddress ||
-            parsedFunction.inputs.some(
-              input => !paramValues[input.name]?.trim(),
-            )
+            parsedFunction.inputs.some(input => {
+              // Allow empty strings for string type fields
+              if (input.type === 'string') {
+                return false
+              }
+              // Require non-empty values for all other types
+              return !paramValues[input.name]?.trim()
+            })
           }
           className="w-full"
         >
