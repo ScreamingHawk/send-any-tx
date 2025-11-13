@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   useAccount,
   useConnect,
@@ -6,6 +7,7 @@ import {
   useSwitchChain,
 } from 'wagmi'
 import { Button } from './Button'
+import { Toast } from './Toast'
 import { ALL_CHAINS } from '../config/wagmi'
 
 export const ConnectWalletButton = () => {
@@ -14,6 +16,7 @@ export const ConnectWalletButton = () => {
   const { disconnect } = useDisconnect()
   const chainId = useChainId()
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain()
+  const [showToast, setShowToast] = useState(false)
 
   const formatAddress = (addr: string | null) => {
     if (!addr) return ''
@@ -49,15 +52,49 @@ export const ConnectWalletButton = () => {
     }
   }
 
+  const handleCopyAddress = async () => {
+    if (address) {
+      try {
+        await navigator.clipboard.writeText(address)
+        setShowToast(true)
+      } catch {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea')
+        textArea.value = address
+        textArea.style.position = 'fixed'
+        textArea.style.opacity = '0'
+        document.body.appendChild(textArea)
+        textArea.select()
+        try {
+          document.execCommand('copy')
+          setShowToast(true)
+        } catch (fallbackErr) {
+          console.error('Failed to copy address:', fallbackErr)
+        }
+        document.body.removeChild(textArea)
+      }
+    }
+  }
+
   return (
     <div className="flex flex-col items-center gap-6">
+      {showToast && (
+        <Toast message="Address copied!" onClose={() => setShowToast(false)} />
+      )}
       {isConnected && address ? (
         <div className="flex flex-col items-center gap-4 w-full">
-          <div className="text-retro-text-muted text-sm">
+          <div className="flex items-center gap-2 text-retro-text-muted text-sm">
             Connected:{' '}
             <span className="text-retro-secondary font-mono">
               {formatAddress(address)}
             </span>
+            <button
+              onClick={handleCopyAddress}
+              className="text-retro-secondary hover:text-retro-accent transition-colors cursor-pointer"
+              aria-label="Copy address"
+            >
+              📋
+            </button>
           </div>
           <Button variant="secondary" size="lg" onClick={handleDisconnect}>
             Disconnect
