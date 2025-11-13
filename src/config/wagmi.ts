@@ -26,6 +26,8 @@ import {
   blast,
   blastSepolia,
   mode,
+  etherlink,
+  etherlinkTestnet,
 } from 'wagmi/chains'
 import { metaMask } from '@wagmi/connectors'
 import { sequence, type Wallet } from '@0xsequence/connect'
@@ -88,6 +90,8 @@ export const ALL_CHAINS: Chain[] = [
   blast,
   blastSepolia,
   mode,
+  etherlink,
+  etherlinkTestnet,
 ]
 
 export const getWagmiConfig = () => {
